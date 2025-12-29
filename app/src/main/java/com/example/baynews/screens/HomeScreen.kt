@@ -47,7 +47,8 @@ fun HomeScreen(
             state.errorMessage != null -> {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
+                        .fillMaxHeight()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.Center
                 ) {

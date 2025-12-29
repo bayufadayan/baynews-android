@@ -15,6 +15,8 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState
 
     private var page = 1
+    private val articleMap = linkedMapOf<String, com.example.baynews.domain.Article>()
+    fun findById(id: String): com.example.baynews.domain.Article? = articleMap[id]
     private val pageSize = 10
     private var totalResults = Int.MAX_VALUE
 
@@ -30,6 +32,8 @@ class HomeViewModel(
                 val (list, total) = repo.getEverything(page = page, pageSize = pageSize)
                 totalResults = total
                 page++
+                articleMap.clear()
+                (headlines + list).forEach { articleMap[it.id] = it }
 
                 _uiState.value = HomeUiState(
                     isLoading = false,
@@ -57,6 +61,7 @@ class HomeViewModel(
                 val (list, total) = repo.getEverything(page = page, pageSize = pageSize)
                 totalResults = total
                 page++
+                list.forEach { articleMap[it.id] = it }
 
                 _uiState.value = _uiState.value.copy(
                     isLoadingMore = false,

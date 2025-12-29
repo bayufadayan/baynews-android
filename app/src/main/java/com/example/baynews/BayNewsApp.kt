@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.baynews.screens.*
+import com.example.baynews.ui.home.HomeViewModel
 
 @Composable
 fun BayNewsApp() {
@@ -78,6 +80,8 @@ fun BayNewsApp() {
             }
 
             composable(Routes.HOME) {
+                val homeVm: HomeViewModel = viewModel()
+
                 HomeScreen(
                     onOpenDetail = { articleId ->
                         navController.navigate("${Routes.DETAIL}/$articleId")
