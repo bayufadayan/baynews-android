@@ -2,6 +2,13 @@ package com.example.baynews.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val MandiriBlue = Color(0xFF003D79)
+val MandiriBlueDark = Color(0xFF002B55)
+val MandiriYellow = Color(0xFFFFC107)
+
+val Background = Color(0xFFF7F8FA)
+val Surface = Color(0xFFFFFFFF)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
