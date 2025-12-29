@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import com.example.baynews.R
+import com.example.baynews.BuildConfig
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {

@@ -1,3 +1,14 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+val newsApiKey: String = localProperties.getProperty("NEWS_API_KEY") ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,7 +33,7 @@ android {
         buildConfigField(
             "String",
             "NEWS_API_KEY",
-            "\"${project.properties["NEWS_API_KEY"]}\""
+            "\"$newsApiKey\""
         )
     }
 
