@@ -8,10 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomeScreen(
-    onOpenDetail: (String) -> Unit,
-    onOpenProfile: () -> Unit
-) {
+fun HomeScreen(onOpenDetail: (String) -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text("Home (stub)")
     }

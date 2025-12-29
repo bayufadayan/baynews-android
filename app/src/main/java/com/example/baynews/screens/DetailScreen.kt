@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun DetailScreen(id: String, onBack: () -> Unit) {
+fun DetailScreen(id: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text("Detail: $id (stub)")
     }

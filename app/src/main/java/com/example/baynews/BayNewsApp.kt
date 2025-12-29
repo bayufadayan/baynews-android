@@ -1,54 +1,101 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.baynews
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.example.baynews.screens.SplashScreen
-import com.example.baynews.screens.HomeScreen
-import com.example.baynews.screens.DetailScreen
-import com.example.baynews.screens.ProfileScreen
+import com.example.baynews.screens.*
 
 @Composable
 fun BayNewsApp() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val route = navBackStackEntry?.destination?.route
 
-    NavHost(
-        navController = navController,
-        startDestination = Routes.SPLASH
-    ) {
-        composable(Routes.SPLASH) {
-            SplashScreen(
-                onFinished = { navController.navigate(Routes.HOME) { popUpTo(Routes.SPLASH) { inclusive = true } } }
-            )
+    val showTopBar = route != Routes.SPLASH
+    val canNavigateBack = navController.previousBackStackEntry != null &&
+            route != Routes.HOME
+
+    val title = when {
+        route == Routes.HOME -> "BayNews"
+        route?.startsWith(Routes.DETAIL) == true -> "Detail"
+        route == Routes.PROFILE -> "Profile"
+        else -> "BayNews"
+    }
+
+    Scaffold(
+        topBar = {
+            if (showTopBar) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    navigationIcon = {
+                        if (canNavigateBack) {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        }
+                    },
+                    actions = {
+                        if (route == Routes.HOME) {
+                            IconButton(onClick = { navController.navigate(Routes.PROFILE) }) {
+                                Icon(Icons.Filled.Person, contentDescription = "Profile")
+                            }
+                        }
+                    }
+                )
+            }
         }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Routes.SPLASH,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Routes.SPLASH) {
+                SplashScreen(
+                    onFinished = {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.SPLASH) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
-        composable(Routes.HOME) {
-            HomeScreen(
-                onOpenDetail = { articleId ->
-                    navController.navigate("${Routes.DETAIL}/$articleId")
-                },
-                onOpenProfile = {
-                    navController.navigate(Routes.PROFILE)
-                }
-            )
-        }
+            composable(Routes.HOME) {
+                HomeScreen(
+                    onOpenDetail = { articleId ->
+                        navController.navigate("${Routes.DETAIL}/$articleId")
+                    }
+                )
+            }
 
-        composable(
-            route = "${Routes.DETAIL}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            DetailScreen(
-                id = id,
-                onBack = { navController.popBackStack() }
-            )
-        }
+            composable(
+                route = "${Routes.DETAIL}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id") ?: ""
+                DetailScreen(id = id)
+            }
 
-        composable(Routes.PROFILE) {
-            ProfileScreen(onBack = { navController.popBackStack() })
+            composable(Routes.PROFILE) {
+                ProfileScreen()
+            }
         }
     }
 }
