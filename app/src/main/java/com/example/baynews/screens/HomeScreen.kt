@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight // Pastikan ini ada
 import androidx.compose.ui.unit.dp
 import com.example.baynews.domain.Article
 import com.example.baynews.ui.home.HomeViewModel
@@ -25,53 +26,41 @@ fun HomeScreen(
     LaunchedEffect(Unit) { vm.loadInitial() }
 
     LaunchedEffect(state.loadMoreError) {
-        val msg = state.loadMoreError ?: return@LaunchedEffect
-        val result = snackbarHostState.showSnackbar(
-            message = msg,
-            actionLabel = "Retry"
-        )
-        if (result == SnackbarResult.ActionPerformed) {
-            vm.loadNextPage()
+        state.loadMoreError?.let { msg ->
+            val result = snackbarHostState.showSnackbar(msg, "Retry")
+            if (result == SnackbarResult.ActionPerformed) {
+                vm.loadNextPage()
+            }
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
-        when {
-            state.isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+        ) {
+            when {
+                state.isLoading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
-
-            state.errorMessage != null -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(state.errorMessage!!)
-                    Spacer(Modifier.height(8.dp))
-                    Button(onClick = { vm.loadInitial() }) { Text("Retry") }
+                state.errorMessage != null -> {
+                    ErrorScreen(msg = state.errorMessage!!, onRetry = { vm.loadInitial() })
                 }
-            }
-
-            else -> {
-                HomeContent(
-                    headline = state.headline,
-                    news = state.news,
-                    isLoadingMore = state.isLoadingMore,
-                    onLoadMore = { vm.loadNextPage() },
-                    onOpenDetail = onOpenDetail
-                )
+                else -> {
+                    HomeContent(
+                        headline = state.headline,
+                        news = state.news,
+                        isLoadingMore = state.isLoadingMore,
+                        onLoadMore = { vm.loadNextPage() },
+                        onOpenDetail = onOpenDetail
+                    )
+                }
             }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
 
@@ -85,41 +74,44 @@ private fun HomeContent(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Section Headline
         item {
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = "Top Headlines",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(Modifier.height(10.dp))
-
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                itemsIndexed(headline) { _, a ->
-                    HeadlineCard(article = a, onClick = { onOpenDetail(a.id) })
+            Column {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "Top Headlines",
+                    // FIX: Menambahkan parameter fontWeight =
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(Modifier.height(12.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    itemsIndexed(headline) { _, item ->
+                        HeadlineCard(article = item, onClick = { onOpenDetail(item.id) })
+                    }
                 }
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    text = "Latest News",
+                    // FIX: Menambahkan parameter fontWeight =
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
-
-            Spacer(Modifier.height(18.dp))
-
-            Text(
-                text = "All News",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(Modifier.height(8.dp))
         }
 
-        itemsIndexed(news) { index, a ->
-            if (index == news.lastIndex) {
-                LaunchedEffect(index) { onLoadMore() }
+        // Section News List
+        itemsIndexed(news) { index, item ->
+            if (index >= news.lastIndex - 1 && !isLoadingMore) {
+                LaunchedEffect(Unit) { onLoadMore() }
             }
-            NewsRow(article = a, onClick = { onOpenDetail(a.id) })
+            NewsRow(article = item, onClick = { onOpenDetail(item.id) })
         }
 
         if (isLoadingMore) {
@@ -130,9 +122,26 @@ private fun HomeContent(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ErrorScreen(msg: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Oops!", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(8.dp))
+        Text(text = msg, style = MaterialTheme.typography.bodyMedium)
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onRetry) { Text("Try Again") }
     }
 }
