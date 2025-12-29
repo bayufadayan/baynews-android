@@ -22,7 +22,7 @@ fun BayNewsApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val route = navBackStackEntry?.destination?.route
 
-    val showTopBar = route != Routes.SPLASH
+    val showTopBar = route != null && route != Routes.SPLASH
     val canNavigateBack = navController.previousBackStackEntry != null &&
             route != Routes.HOME
 
