@@ -10,17 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.baynews.ui.home.HomeViewModel
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
+import com.example.baynews.ui.home.HomeViewModel
 
 @Composable
-fun DetailScreen(id: String) {
-    val homeVm: HomeViewModel = viewModel() // same VM scope (nav graph)
-    val article = homeVm.findById(id)
+fun DetailScreen(id: String, vm: HomeViewModel) {
+    val article = vm.findById(id)
 
     if (article == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {

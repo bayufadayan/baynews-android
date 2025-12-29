@@ -17,6 +17,8 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.baynews.screens.*
 import com.example.baynews.ui.home.HomeViewModel
+import android.net.Uri
+import androidx.compose.runtime.remember
 
 @Composable
 fun BayNewsApp() {
@@ -84,8 +86,9 @@ fun BayNewsApp() {
 
                 HomeScreen(
                     onOpenDetail = { articleId ->
-                        navController.navigate("${Routes.DETAIL}/$articleId")
-                    }
+                        navController.navigate("${Routes.DETAIL}/${Uri.encode(articleId)}")
+                    },
+                    vm = homeVm
                 )
             }
 
@@ -93,8 +96,13 @@ fun BayNewsApp() {
                 route = "${Routes.DETAIL}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
-                val id = backStackEntry.arguments?.getString("id") ?: ""
-                DetailScreen(id = id)
+                val encoded = backStackEntry.arguments?.getString("id") ?: ""
+                val id = Uri.decode(encoded)
+
+                val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
+                val homeVm: HomeViewModel = viewModel(homeEntry)
+
+                DetailScreen(id = id, vm = homeVm)
             }
 
             composable(Routes.PROFILE) {

@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.baynews.domain.Article
 import com.example.baynews.ui.home.HomeViewModel
 import com.example.baynews.screens.components.HeadlineCard
@@ -18,7 +17,7 @@ import com.example.baynews.screens.components.NewsRow
 @Composable
 fun HomeScreen(
     onOpenDetail: (String) -> Unit,
-    vm: HomeViewModel = viewModel()
+    vm: HomeViewModel
 ) {
     val state by vm.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
