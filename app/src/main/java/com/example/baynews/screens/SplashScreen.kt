@@ -20,6 +20,7 @@ import com.example.baynews.R
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
     LaunchedEffect(Unit) {
+        android.util.Log.d("BayNews", "API key length = ${BuildConfig.NEWS_API_KEY.length}")
         delay(1200)
         onFinished()
     }
