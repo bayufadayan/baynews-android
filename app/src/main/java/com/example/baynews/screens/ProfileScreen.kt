@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileScreen() {
-    // Dummy Data
     val name = "Bayu (Bay)"
     val role = "Computer Science Student"
     val email = "bayu.065121100@unpak.ac.id"
@@ -37,7 +36,6 @@ fun ProfileScreen() {
     ) {
         Spacer(Modifier.height(20.dp))
 
-        // Avatar Placeholder
         Box(
             modifier = Modifier
                 .size(100.dp)
